@@ -99,4 +99,19 @@ userSchema.static("hashPassword", async function (plainPassword: string) {
   return password;
 });
 
+// pre-save hook
+// This hook is called before saving a user document
+// It can be used to perform actions like hashing the password
+userSchema.pre("save", async function () {
+  this.password = await bcrypt.hash(this.password, 10);
+  // console.log("inside pre save hook");
+});
+
+// post-save hook
+// This hook is called after saving a user document
+// It can be used to perform actions like logging or sending notifications
+userSchema.post("save", function (doc) {
+  console.log("inside post save hook", doc);
+});
+
 export const User = model<IUser, UserStaticMethods>("User", userSchema);
