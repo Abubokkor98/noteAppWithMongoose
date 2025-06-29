@@ -6,6 +6,7 @@ import {
   UserInstanceMethods,
   UserStaticMethods,
 } from "../interfaces/user.interfaces";
+import { Note } from "./notes.model";
 const bcrypt = require("bcrypt");
 
 // embedding address schema
@@ -102,16 +103,37 @@ userSchema.static("hashPassword", async function (plainPassword: string) {
 // pre-save hook
 // This hook is called before saving a user document
 // It can be used to perform actions like hashing the password
-userSchema.pre("save", async function () {
+userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
   // console.log("inside pre save hook");
+  next();
 });
 
-// post-save hook
+// pre find hook (query middleware)
+// This hook is called before finding user documents
+// It can be used to perform actions like logging or modifying the query
+userSchema.pre("find", function (next) {
+  console.log("from find pre middleware");
+  next();
+});
+
+// post-save hook (document middleware)
 // This hook is called after saving a user document
 // It can be used to perform actions like logging or sending notifications
-userSchema.post("save", function (doc) {
+userSchema.post("save", function (doc, next) {
   console.log("inside post save hook", doc);
+  next();
+});
+
+//post findOneAndDelete hook (query middleware)
+// This hook is called after deleting a user document
+// It can be used to perform actions like deleting related documents
+userSchema.post("findOneAndDelete", async function (doc, next) {
+  if (doc) {
+    // console.log("from delete doc post middleware", doc);
+    await Note.deleteMany({ user: doc._id });
+  }
+  next();
 });
 
 export const User = model<IUser, UserStaticMethods>("User", userSchema);

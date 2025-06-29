@@ -84,7 +84,8 @@ usersRoutes.patch("/:id", async (req: Request, res: Response) => {
 
 usersRoutes.delete("/:id", async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const user = await User.findByIdAndDelete(userId);
+  // const user = await User.findByIdAndDelete(userId);
+  const user = await User.findOneAndDelete({ _id: userId });
 
   res.status(200).json({
     success: true,
