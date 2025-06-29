@@ -23,7 +23,7 @@ notesRoutes.post("/create-note", async (req: Request, res: Response) => {
 });
 
 notesRoutes.get("/", async (req: Request, res: Response) => {
-  const notes = await Note.find();
+  const notes = await Note.find().populate("user"); // Populate user details
   res.status(200).json({
     success: true,
     data: notes,

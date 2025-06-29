@@ -22,6 +22,11 @@ const noteSchema = new Schema<INotes>(
       type: Boolean,
       default: false,
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User", // User model er sathe reference
+      required: true, // userId field is required
+    },
   },
   {
     versionKey: false,
