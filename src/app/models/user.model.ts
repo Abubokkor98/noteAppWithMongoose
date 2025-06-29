@@ -86,6 +86,12 @@ const userSchema = new Schema<IUser, UserStaticMethods, UserInstanceMethods>(
   {
     versionKey: false, // disables the __v field
     timestamps: true, // adds createdAt and updatedAt fields
+    toJSON: {
+      virtuals: true, // includes virtuals in the JSON output
+    },
+    toObject:{
+      virtuals: true, // includes virtuals in the object output
+    }
   }
 );
 
@@ -134,6 +140,13 @@ userSchema.post("findOneAndDelete", async function (doc, next) {
     await Note.deleteMany({ user: doc._id });
   }
   next();
+});
+
+// Virtual property to get full name
+// This is a virtual property that combines firstName and lastName
+// It does not get stored in the database, but can be used in queries
+userSchema.virtual("fullName").get(function (this: IUser) {
+  return `${this.firstName} ${this.lastName}`;
 });
 
 export const User = model<IUser, UserStaticMethods>("User", userSchema);
